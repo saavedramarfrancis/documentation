@@ -26,16 +26,18 @@ Changes made to the `pantheon.yml` file on a branch **are not** detected when cr
 
 ### All PHP Versions
 
-| Version                                      | Recommended | Status |
-| --------------------------------------------:| ----------- | ------ |
-| [7.4](https://v74-php-info.pantheonsite.io/) | <span style="color:green">✔</span> | Active |
-| [7.3](https://v73-php-info.pantheonsite.io/) | <span style="color:green">✔</span> | Active |
-| [7.2](https://v72-php-info.pantheonsite.io/) | <span style="color:green">✔</span> | Active |
-| [7.1](https://v71-php-info.pantheonsite.io/) | ❌           | EOL     |
-| [7.0](https://v70-php-info.pantheonsite.io/) | ❌           | EOL     |
-| [5.6](https://v56-php-info.pantheonsite.io/) | ❌           | EOL     |
-| [5.5](https://v55-php-info.pantheonsite.io/) | ❌           | EOL     |
-| [5.3](https://v53-php-info.pantheonsite.io/) | ❌           | Retired |
+| Version                                      | Recommended |  Status |
+| --------------------------------------------:|:-----------:| ------- |
+| 8.1 | ➖ | In development |
+| [8.0](https://v80-php-info.pantheonsite.io/) | ✅          | Active  |
+| [7.4](https://v74-php-info.pantheonsite.io/) | ✅          | Active  |
+| [7.3](https://v73-php-info.pantheonsite.io/) | ❌          | EOL     |
+| [7.2](https://v72-php-info.pantheonsite.io/) | ❌          | EOL     |
+| [7.1](https://v71-php-info.pantheonsite.io/) | ❌          | EOL     |
+| [7.0](https://v70-php-info.pantheonsite.io/) | ❌          | EOL     |
+| [5.6](https://v56-php-info.pantheonsite.io/) | ❌          | EOL |
+| [5.5](https://v55-php-info.pantheonsite.io/) | ❌          | EOL |
+| [5.3](https://v53-php-info.pantheonsite.io/) | ❌          | EOL * |
 
 Click on the links above to see the complete PHP info for each version, including the list of supported PHP extensions.
 
@@ -49,27 +51,19 @@ End-of-life (**EOL**) versions are available on the platform but no longer under
 
 </dd>
 
-<dt>Retired</dt>
-
-<dd>
-
-Sites using retired versions of PHP will continue to serve pages, but new development cannot be done. To resume development on a site using a retired version of PHP, first upgrade the PHP version on the development environment.
-
-</dd>
-
 </dl>
 
+\* Sites that use this version of PHP will continue to serve pages, but new development cannot be done. The behavior of the development environment is undefined and not supported. To resume development on a site using a retired version of PHP, upgrade the PHP version on the development environment. 
 
-<Alert title="Note" type="info">
+
+### CMS Version Requirements
 
 Before changing your PHP version, confirm that your CMS is compatible:
 
 - [WordPress Requirements](https://wordpress.org/about/requirements/)
-- [Drupal 8 PHP versions supported](https://www.drupal.org/docs/8/system-requirements/php-requirements#php_required)
-- [Drupal 7 PHP versions supported](https://www.drupal.org/docs/7/system-requirements/drupal-7-php-requirements#php_required)
-- As of Drupal 6.45, Drupal 6 is [compatible with PHP 7.2](https://www.mydropwizard.com/blog/announcing-drupal-645-and-selected-contrib-php-72). Older versions of Drupal 6 require PHP 5.4 and below.
+- [Drupal 8 and 9 PHP version support](https://www.drupal.org/docs/system-requirements/php-requirements#php_required)
+- [Drupal 7 PHP version support](https://www.drupal.org/docs/7/system-requirements/php-requirements#php_required)
 
-</Alert>
 
 ## Configure PHP Version
 
@@ -139,7 +133,7 @@ We recommend working with theme, module, or plugin maintainers to resolve any is
 
 ### Upgrading PHP Version May Require Upgrading Drush Versions
 
-If you see errors on the Pantheon Dashboard when trying to auto-run `update.php`, for example, upgrading Drush should resolve the issue. For more information, see [Manage Drush Versions on Pantheon](https://pantheon.io/docs/drush-versions/#configure-drush-version).
+If you see errors on the Pantheon Dashboard when trying to auto-run `update.php`, for example, upgrading Drush should resolve the issue. For more information, see [Manage Drush Versions on Pantheon](/drush-versions/#configure-drush-version).
 
 ## See Also
 

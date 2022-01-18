@@ -48,31 +48,19 @@ Most often, the best solution is to implement data exports as a web service, inc
 
 ## Compute Optimized Environments (COE)
 
-<ReviewDate date="2020-05-15" />
+<ReviewDate date="2020-11-02" />
 
 Compute Optimized Environments (COE) improves CPU performance over the previous infrastructure by up to 40%. COE includes changes to the runtime operating system, file structure, and binary content of Pantheon’s Site Environments. While these changes are transparent to most sites on the platform, there is the potential for custom code to interact with these components in a way that may need to be adjusted or optimized.
 
 ### Is my site on COE?
 
-Sites on COE display the following banner at the top of the Site Dashboard:
-
-<Alert type="info" icon="info-sign" title="This environment is now Compute Optimized!">
-
-For enhanced security and a more intuitive experience:
-
-- Up to 40% improved PHP performance
-- OCI standard containers with enhanced security and new directory structure
-- Updated components including wkhtmltopdf, imagemagick, and OpenSSL
-
-See [Platform Considerations](#compute-optimized-environments-coe) to review a full list of considerations related to custom code or config.
-
-</Alert>
+Yes. All sites are on COE.
 
 ### Home Directory
 
-The site environment home directory has changed from `/srv/bindings/[UUID]` to root `/`.
+The site environment home directory is in the root `/`.
 
-Pantheon has provided backward compatibility for site code that references the previous home directory, by adding a symlink `/srv/bindings/[UUID]` to `/`.
+Pantheon has provided backward compatibility for site code that references the previous home directory by adding a symlink `/srv/bindings/[UUID]` to `/`.
 
 External scripts that reference `/srv/bindings/[UUID]` should check that the path exists. If the prior home directory does not exist, then your scripts should write to the new home directory location.
 
@@ -117,7 +105,7 @@ For sites that need to provide services with Cross-Origin Resource Sharing (COR
 
 Sites that consume services using CORS, such as Amazon S3 CORS, do work on Pantheon.
 
-For WordPress users, you can use the [WP-CORS plugin](https://wordpress.org/plugins/wp-cors/), or enable CORS for selected domains [in an MU plugin](/mu-plugin#cross-origin-resource-sharing-cors)
+WordPress users can use the [WP-CORS plugin](https://wordpress.org/plugins/wp-cors/) or enable CORS for selected domains [in an MU plugin](/mu-plugin#cross-origin-resource-sharing-cors)
 
 ## CSS Preprocessors
 
@@ -127,17 +115,25 @@ Pantheon does not currently support LESS or Sass/Compass CSS preprocessor langua
 
 MySQL stored procedures are not supported. Due to the nature of the platform, there is no guarantee that they will  persist following a database migration. You can avoid the use of stored procedures by using parameterized queries or [object-relational mapping](https://en.wikipedia.org/wiki/Object-relational_mapping).
 
+MySQL [Triggers](https://dev.mysql.com/doc/refman/8.0/en/triggers.html) and [Events](https://dev.mysql.com/doc/refman/8.0/en/events-overview.html) are also not supported. As an alternative, you may consider Cron for [WordPress](https://pantheon.io/docs/wordpress-cron) or [Drupal](https://pantheon.io/docs/drupal-cron). 
+
 ## Drupal 7 and Ampersands
 
-A Drupal 7 site given a URL with an ampersand (&) in it, excluding query parameter separation, will return a 404, regardless of the presence of a matching path.
+A Drupal 7 site given a URL with an ampersand (`&`) in it, excluding query parameter separation, will return a 404, regardless of the presence of a matching path.
 
 Be sure to encode URLs that use ampersands with `%26` in place of `&`.
+
+## Drupal Steward
+
+The Pantheon platform includes [Drupal Steward](https://www.drupal.org/drupal-security-team/steward), a platform-level mitigation of certain highly-critical vulnerabilities that are identified in Drupal core, as a feature for all Drupal sites on Pantheon. All Pantheon sites are protected by Drupal Steward.
+
+For more information about Drupal Steward, refer to the [Drupal Steward FAQ](https://www.drupal.org/drupal-security-team/steward/faq).
 
 ## Email and Deliverability
 
 Because of the cloud-based nature of Pantheon's infrastructure, we cannot ensure high-deliverability email originating from your Application Containers, as they have no fixed location. While all sites have access to a local Postfix service for testing and development, we recommend using an external SMTP gateway (SendGrid, for example) in production to ensure that your email is delivered.
 
-See [the email documentation](/email) for more details and suggestions.
+See the [Email for Drupal documentation](/email) or the [WP Mail SMTP](/guides/sendgrid-wordpress-wp-mail-smtp) doc for more details and suggestions.
 
 ## Emoji Support
 
@@ -182,7 +178,7 @@ Pantheon sites use NGINX to concurrently serve requests. The NGINX web server ig
 
 For details, see [Configure Redirects](/redirects/#php-vs-htaccess).
 
-If your site contains rules in `.htaccess` that cannot be migrated to PHP, Pantheon offers its [Advanced Global CDN](/advanced-global-cdn) as a managed service. Custom `.htaccess` rules often can be converted to run on a custom Varnish layer provided by Advanced Global CDN. Please contact your Customer Success Manager (CSM) or [contact us](https://pantheon.io/contact-us?docs) for more information.
+If your site contains rules in `.htaccess` that cannot be migrated to PHP, Pantheon offers its [Advanced Global CDN](/guides/professional-services/advanced-global-cdn) as a managed service. Custom `.htaccess` rules often can be converted to run on a custom Varnish layer provided by Advanced Global CDN. Please contact your Customer Success Manager (CSM) or [contact us](https://pantheon.io/contact-us?docs) for more information.
 
 ### Drupal False Positive
 
@@ -202,13 +198,13 @@ For PDF viewer plugins that rely on Mozilla's [PDF.js](https://github.com/mozill
 
 Image optimization libraries such as advpng, OptiPNG, PNGCRUSH, jpegtran, jfifremove, advdef, pngout, jpegoptim have to be installed on the server. At this time, they are not supported. For more information see [Modules with Known Issues.](/modules-known-issues/#imageapi-optimize)
 
-Pantheon also offers Image Optimization as part of Advanced CDN (a [Professional Services](/professional-services#advanced-cdn) engagement). Please contact your Customer Success Manager (CSM) or [contact us](https://pantheon.io/contact-us?docs) for more information.
+Pantheon also offers Image Optimization as part of Advanced CDN (a [Professional Services](/guides/professional-services/advanced-global-cdn) engagement). Please contact your Customer Success Manager (CSM) or [contact us](https://pantheon.io/professional-services?docs) for more information.
 
 ## Inactive Site Freezing
 
 Sandbox sites that are over four months old that have not had code commits or other Git activity for three months are "frozen". All requests to a frozen site will return a `530 Site Frozen` error code, and the site's Dashboard will be unavailable.
 
-You can easily reactivate a site by visiting your Pantheon User Dashboard, select the frozen site there, then click **Unfreeze site**. Within a few minutes, the site will be ready for development again.
+You can easily reactivate a site by visiting your Pantheon User Dashboard, select the frozen site in the Dashboard, then click **Unfreeze site**. Within a few minutes, the site will be ready for development again.
 
 If you experience any issues, like missing static assets, a [backup](/restore-environment-backup#restore-an-environment-from-its-own-backup) of the site is available and can be restored via the Site Dashboard. Please note that only files that have been committed will be available after unfreezing.
 
@@ -218,7 +214,7 @@ IP-based security is not recommended on Pantheon - or any cloud platform because
 
 For more information, see [Dynamic Outgoing IP Addresses](/outgoing-ips).
 
-If you require IP address-level access control, [Advanced Global CDN](/advanced-global-cdn#ip-allowlisting--blocklisting) can provide IP-based safelist/blocklist features, as well as IP-based routing. Please contact your Customer Success Manager (CSM) or [contact us](https://pantheon.io/contact-us?docs) for more information.
+If you require IP address-level access control, [Advanced Global CDN](/guides/professional-services/advanced-global-cdn#ip-allowlisting--blocklisting) can provide IP-based safelist/blocklist features, as well as IP-based routing. Please contact your Customer Success Manager (CSM) or [contact us](https://pantheon.io/contact-us?docs) for more information.
 
 ## Large Code Repository
 
@@ -234,7 +230,7 @@ Due to the configuration of the [Pantheon Filesystem](/files), Pantheon's file s
 |:--------------- | ------------------------------- |------------------------------------ |
 | ≤ 100MB         | <span  style="color:green">✔</span>  | Can be uploaded via any means       |
 |   100MB - 256MB | <span  style="color:orange">✔</span> | Must be uploaded over SFTP or rsync |
-| > 256MB         | <span  style="color:red">❌</span>   | Must be hosted via 3rd party CDN    |
+| > 256MB         | <span  style="color:red">❌</span>   | Must be hosted via 3rd-party CDN    |
 
 If you are distributing large binaries or hosting big media files, we recommend using a CDN like Amazon S3 as a cost-effective file serving solution that allows uploads directly to S3 from your site without using Pantheon as an intermediary.
 
@@ -251,13 +247,31 @@ Uploading large files over a slow local internet connection can cause the proces
 
 ## Large (>100GB) File Backups
 
-Large backups take longer, use more resources, and have a higher likelihood of failing. Additionally, a 100GB compressed tarball is in itself not particularly convenient for anyone. For this reason, scheduled backups do not backup files for sites with footprints over 200GB (although code and database are backed-up as normal). Despite the lack of backups, file content is highly durable and stored on multiple servers.
+Large backups take longer, use more resources, and have a higher likelihood of failing. Additionally, a 100GB compressed tarball is in itself not particularly convenient for anyone. For this reason, scheduled backups do not backup files for sites with footprints over 200GB (although code and database are backed-up as normal). Despite the lack of backups, file content is highly durable and stored on multiple servers.
 
 ## Maintenance Mode
 
 Pantheon may send a [generic Maintenance Mode message](/errors-and-server-responses#pantheon-503-target-in-maintenance) during platform problems; this message cannot be customized.
 
 Built-in Maintenance Mode for both Drupal and WordPress sites can be customized; clear caches when toggling.
+
+## MariaDB 10.4 and innodb_strict_mode=ON: Row Size Too Large Errors
+
+MariaDB 10.4 on Pantheon has `innodb_strict_mode` set to `ON`. This leads to `Row size too large` errors that are not present on earlier versions of MariaDB:
+
+```sql
+ERROR 1118 (42000): Row size too large (> 8126). Changing some columns to TEXT or BLOB may help. In current row format, BLOB prefix of 0 bytes is stored inline.
+```
+
+To avoid this error, modify your tables to use `row_format=DYNAMIC`.
+
+<Accordion title="How to update all tables to row_format=DYNAMIC" id="row-size-too-large">
+
+<Partial file="row-size-too-large-alter-table.md" />
+
+</Accordion>
+
+For more information on how to diagnose tables and troubleshoot potential issues, refer to the [official MariaDB documentation](https://mariadb.com/kb/en/troubleshooting-row-size-too-large-errors-with-innodb/).
 
 ## Modules and Plugins with Known Issues
 
@@ -269,13 +283,21 @@ Pantheon supports designated use cases for [WordPress Site Networks](/guides/mul
 
 We do not support [Drupal Multisite](https://www.drupal.org/docs/7/multisite-drupal/multi-site-sharing-the-same-code-base). See blog posts: [Why Drupal Multisite is not Enterprise Grade](https://pantheon.io/blog/why-drupal-multisite-not-enterprise-grade) and [Much Ado About Drupal Multisite](https://pantheon.io/blog/much-ado-about-drupal-multisite).
 
+## MySQL LOAD DATA LOCAL INFILE
+
+For [security reasons](https://dev.mysql.com/doc/refman/8.0/en/load-data-local-security.html), Pantheon does not support executing MySQL `LOAD DATA LOCAL INFILE` statements from your PHP application. As a workaround, developers can [connect directly to MySQL](/mysql-access) and load files from their local machine:
+
+```bash{promptUser: user}
+MariaDB [pantheon]> LOAD DATA LOCAL INFILE 'mydata.csv' INTO TABLE `pantheon`.`mytable` FIELDS TERMINATED BY ',' ENCLOSED BY '\"' LINES TERMINATED BY '\n';
+```
+
 ## nginx.conf
 
 Pantheon does not currently support modifying the `nginx.conf` per site, as we run a highly tuned universal configuration file. All of the containers run a standard profile, and we have opted to keep this configuration to keep the `nginx.conf` lean.
 
 If your site uses `nginx.conf` rules for redirects, see [Configure Redirects](/redirects/#php-vs-htaccess).
 
-If your site contains rules in `nginx.conf` that cannot be migrated to PHP, Pantheon offers [Advanced Global CDN](/advanced-global-cdn) as a managed service. Custom `nginx.conf` rules often can be converted to run on a custom Varnish layer provided by Advanced Global CDN. Please contact your Customer Success Manager (CSM) or [contact us](https://pantheon.io/contact-us?docs) for more information.
+If your site contains rules in `nginx.conf` that cannot be migrated to PHP, Pantheon offers [Advanced Global CDN](/guides/professional-services/advanced-global-cdn) as a managed service. Custom `nginx.conf` rules often can be converted to run on a custom Varnish layer provided by Advanced Global CDN. Please contact your Customer Success Manager (CSM) or [contact us](https://pantheon.io/contact-us?docs) for more information.
 
 ## Node.js
 
@@ -292,7 +314,7 @@ Domain masking allows you to serve two entirely different and separate sites ove
 - Main Site: `https://www.example-site.com/`
 - Blog: `https://www.example-site.com/blog/`
 
-Domain masking is available through Pantheon's [Advanced Global CDN](/advanced-global-cdn#domain-masking-and-reverse-proxy) managed service. If you require domain masking, ask your Customer Success Manager (CSM) or [contact us](https://pantheon.io/contact-us?docs). Customers may also set up domain masking using a third-party CDN service, but please note that third-party services are outside [Pantheon's scope of support](/support/#scope-of-support).
+Domain masking is available through Pantheon's [Advanced Global CDN](/guides/professional-services/advanced-global-cdn#domain-masking-and-reverse-proxy) managed service. If you require domain masking, ask your Customer Success Manager (CSM) or [contact us](https://pantheon.io/contact-us?docs). Customers may also set up domain masking using a third-party CDN service, but please note that third-party services are outside [Pantheon's scope of support](/support/#scope-of-support).
 
 ### Additional Databases
 
@@ -328,6 +350,10 @@ File directories on Pantheon's file serving infrastructure cannot be moved or re
 
 Pantheon does not and will not support Server Side Includes. We recommend converting those to use PHP includes.
 
+## Static Files
+
+Pantheon strips cookies for files with common static file extensions. See [File Suffixes and Cookies](/caching-advanced-topics#file-suffixes-and-cookies) in our [Caching: Advanced Topics](/caching-advanced-topics) doc for more information.
+
 ## Streaming Media
 
 Because Pantheon does not provide [transcoding](https://en.wikipedia.org/wiki/Transcoding#Re-encoding.2Frecoding), bandwidth-adaptive media delivery, or support for large files (see below), [streaming media](https://en.wikipedia.org/wiki/Streaming_media) is not possible directly from the platform.
@@ -341,6 +367,16 @@ It is also possible to deliver smaller media files from Pantheon using [progress
 [Terminus](/terminus), our command-line tool for power users, is designed for 'nix-type operating systems like MacOS and Linux. While some people have installed Terminus on Windows using the [Git BASH on Git for Windows](https://git-for-windows.github.io) or [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) shells, this is not officially supported.
 
 If you're a Windows user, consider using a virtualization tool like [VirtualBox](https://www.virtualbox.org/) to run a virtualized 'nix-type environment for tools like Terminus.
+
+## Terminus Can't Delete a Site or Multidev
+
+You might encounter the following error when a site is created and then quickly deleted, or is deleted before the site creation process has completed:
+
+```shell
+[error] The environment '1234567' was not found.
+```
+
+[Contact Support](/support) and ask to have the environment deleted.
 
 ## Write Access on Environments
 

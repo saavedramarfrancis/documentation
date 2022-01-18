@@ -12,7 +12,7 @@ After a user leaves, we recommend you:
 - Delete or block the user's account in [Drupal](https://www.drupal.org/node/627158) or [WordPress](https://codex.wordpress.org/Users_Users_SubPanel).
 - Remove the user from the team and/or organization in the Pantheon Dashboard.
 - Change any shared account passwords the user may have had access to.
-- Review the Git history in the commit log to see if the site team member made code changes after leaving. See recommendations from [Drupal](https://www.drupal.org/node/2365547) and [WordPress](https://codex.wordpress.org/FAQ_My_site_was_hacked).
+- Review the Git history in the commit log to see if the site team member made code changes after leaving. See recommendations from [Drupal](https://www.drupal.org/node/2365547) and [WordPress](https://wordpress.org/support/article/faq-my-site-was-hacked/).
 
 ## Remove a Team Member from a Site
 When you delete a user from a site, they lose the ability to perform any site operations via the Dashboard or Terminus.
@@ -35,7 +35,7 @@ The user account in question must [transfer ownership to another person in the o
 For all sites, we recommend instructing users to change their passwords regularly, using two-factor authentication, restricting access with Change Management, and carefully planning who will create client sites in the organization.
 
 ## See Also
-[Accessing an Account After the Owner Leaves](/site-access)
-[Role-Based Permissions & Change Management](/change-management)
-[Secure Your Site with Two-Factor Authentication](/guides/two-factor-authentication)
-[Team Management](/team-management)
+- [Accessing an Account After the Owner Leaves](/site-access)
+- [Role-Based Permissions & Change Management](/change-management)
+- [Secure Your Site with Two-Factor Authentication](/guides/two-factor-authentication)
+- [Team Management](/team-management)

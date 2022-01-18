@@ -17,7 +17,7 @@ export env=dev
 
 ## Default Temporary Path
 
-Pantheon configures an appropriate temporary path for [WordPress](https://github.com/pantheon-systems/WordPress/blob/default/wp-config-pantheon.php#L67) and [Drupal 8](https://github.com/pantheon-systems/drops-8/blob/8.5.3/sites/default/settings.pantheon.php#L146-L154). Drupal 7 sites can achieve the same configuration by adding the following to `settings.php`:
+Pantheon configures an appropriate temporary path for [WordPress](https://github.com/pantheon-systems/WordPress/blob/default/wp-config-pantheon.php#L67) and [Drupal 8](https://github.com/pantheon-systems/drops-8/blob/default/sites/default/settings.pantheon.php#L142-L150). Drupal 7 sites can achieve the same configuration by adding the following to `settings.php`:
 
 ```php
 /**
@@ -25,9 +25,19 @@ Pantheon configures an appropriate temporary path for [WordPress](https://github
  * Define appropriate location for tmp directory
  */
 if (isset($_ENV['PANTHEON_ENVIRONMENT'])) {
+  if (isset($_SERVER['PRESSFLOW_SETTINGS'])) { 
+    // It's necessary to unset the injected PRESSFLOW_SETTINGS to override the values.
+    $pressflow_settings = json_decode($_SERVER['PRESSFLOW_SETTINGS'], TRUE); 
+    unset($pressflow_settings['conf']['file_temporary_path']); 
+    unset($pressflow_settings['conf']['file_directory_temp']); 
+    $_SERVER['PRESSFLOW_SETTINGS'] = json_encode($pressflow_settings); 
+  } 
   $conf['file_temporary_path'] = $_SERVER['HOME'] .'/tmp';
+  $conf['file_directory_temp'] = $_SERVER['HOME'] .'/tmp';
 }
 ```
+
+**Note:** Changing the temporary settings path for Drupal 7 is not recommended. While the changes above would allow temporary files to be shared across application containers, it comes with a heavy performance penalty. 
 
 ## Fix Unsupported Temporary Path
 

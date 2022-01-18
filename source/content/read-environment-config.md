@@ -42,21 +42,9 @@ Pantheon uses Pressflow to automatically read the environmental configuration. I
 extract(json_decode($_SERVER['PRESSFLOW_SETTINGS'], TRUE));
 ```
 
-## Drupal 6
-
-```php
-<?php
-$settings = json_decode($_SERVER['PRESSFLOW_SETTINGS'], TRUE);
-$db = $settings['databases']['default']['default'];
-// You can do the following on one line. It's broken in two here for readability.
-$db_url = $db['driver'] . '://' . $db['username'] . ':' . $db['password'];
-$db_url .= '@' . $db['host'] . ':' . $db['port'] . '/' . $db['database'];
-$conf = $settings['conf'];
-```
-
 ## Domain Access
 
-Place [Domain Access setup routine](https://www.drupal.org/node/1096962) above any [Redis configurations](/redis#enable-redis) in `settings.php`. For example, for Drupal 7:
+Place [Domain Access setup routine](https://www.drupal.org/node/1096962) above any [Redis configurations](/object-cache#enable-object-cache) in `settings.php`. For example, for Drupal 7:
 
 ```php
 // All Pantheon Environments.
@@ -66,7 +54,7 @@ if (defined('PANTHEON_ENVIRONMENT')) {
   extract(json_decode($_SERVER['PRESSFLOW_SETTINGS'], TRUE));
   // All $conf variables and Redis configuration go after extract()
 
-  // If using Redis add appropriate settings per /docs/redis/
+  // If using Redis add appropriate settings per /docs/object-cache/
 
   // Add other $conf variables, for example for Fast 404 pages
 
@@ -91,21 +79,7 @@ For more information, see [configuring wp-config.php](/wp-config-php).
 
 ## Hard-coded Directory References and $_ENV\['HOME']
 
-Some sites are on a newer version of the Pantheon infrastructure and will display the following banner at the top of the Site Dashboard:
-
-<Alert type="info" icon="info-sign" title="This environment is now Compute Optimized!">
-
-For enhanced security and a more intuitive experience:
-
-- Up to 40% improved PHP performance
-- OCI standard containers with enhanced security and new directory structure
-- Updated components including wkhtmltopdf, imagemagick, and OpenSSL
-
-See [Platform Considerations](/platform-considerations#compute-optimized-environments-coe) to review a full list of considerations related to custom code or config.
-
-</Alert>
-
-For these sites, and as a general best-practice, the home directory should be referenced through the `$_ENV` variable:
+As a general best-practice, the home directory should be referenced through the `$_ENV` variable:
 
 ```php
 $_ENV['HOME']

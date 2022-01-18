@@ -3,16 +3,24 @@ title: Pantheon YAML Configuration Files
 description: Learn how to manage advanced site configuration
 categories: [platform]
 tags: [https, launch, code, workflow]
+reviewed: "2021-04-13"
 ---
+
 Hook into platform workflows and manage advanced site configuration via the `pantheon.yml` file. Add it to the root of your site's codebase, and deploy it along with the rest of your code.
 
-<Enablement title="Quicksilver Cloud Hooks Training" link="https://pantheon.io/agencies/learn-pantheon?docs">
+## Find or Create pantheon.yml
 
-Set up existing scripts and write your own with help from our experts. Pantheon delivers custom workshops to help development teams master our platform and improve their internal WebOps.
+Your site's `pantheon.yml` configuration file can be found in the root of your site's code repository. If you have a local git clone of your site, this is the project root. When looking at the site over an SFTP connection, look in the `code` directory.
 
-</Enablement>
+If the `pantheon.yml` file is not present, you may create one.
 
 For reference implementations see [example.pantheon.yml](https://github.com/pantheon-systems/quicksilver-examples/blob/master/example.pantheon.yml) and [Quicksilver Example Scripts](https://github.com/pantheon-systems/quicksilver-examples).
+
+<Enablement title="Quicksilver Cloud Hooks Training" link="https://pantheon.io/learn-pantheon?docs">
+
+Set up existing scripts and write your own with help from our experts. Pantheon delivers on-demand training to help development teams master our platform and improve their internal WebOps.
+
+</Enablement>
 
 ## Advanced Site Configuration
 
@@ -20,7 +28,7 @@ For reference implementations see [example.pantheon.yml](https://github.com/pant
 
 Define the `api_version` property in order for `pantheon.yml` to be valid:
 
-```yaml
+```yaml:title=pantheon.yml
 api_version: 1
 ```
 
@@ -28,7 +36,7 @@ api_version: 1
 
 Protect files and directories inside of your docroot from public web access with `protected_web_paths`. For example, the following ensures that a visitor to `https://example.com/example.txt` or `https://example.com/example_directory/any_nested_file` receives Access Denied (403):
 
-```yaml
+```yaml:title=pantheon.yml
 protected_web_paths:
   - /example.txt
   - /example_directory
@@ -49,7 +57,7 @@ The `pantheon.upstream.yml` file provided by your upstream might define protecte
 
 To disable all of the protected web paths defined by your site's upstream and all protected paths defined by the Pantheon platform, set the `protected_web_paths_override` property to `true`:
 
-```yaml
+```yaml:title=pantheon.yml
 protected_web_paths_override: true
 ```
 
@@ -73,7 +81,7 @@ Pantheon sites (using the default Pantheon upstreams) created or updated on or a
 
 #### Test Your Site's HSTS Configuration for an A+ Rating
 
-[SSL Labs](https://www.ssllabs.com) provides a free, online service that you can use to test your Site's configuration. In order to obtain an A+ rating, a long-duration HSTS header using the `full` or `full+subdomains` value is required.
+[SSL Labs](https://www.ssllabs.com) provides a free, online service that you can use to test your site's configuration. In order to obtain an A+ rating, a long-duration HSTS header using the `full` or `full+subdomains` value is required.
 
 1. To test your configuration, select a short-duration HSTS header (`transitional` or `transitional+subdomains`), before committing to the long-duration HSTS header.
 
@@ -83,7 +91,7 @@ Pantheon sites (using the default Pantheon upstreams) created or updated on or a
 
 Nest your docroot one level beneath your code repository in a directory named `web`:
 
-```yaml
+```yaml:title=pantheon.yml
 web_docroot: true
 ```
 
@@ -95,32 +103,113 @@ For more information, see [Serving Sites from the Web Subdirectory](/nested-docr
 
 Override the upstream's default PHP version with the `php_version` property. PHP version is managed in version control and deployed along with the rest of your site's code to encourage testing before making a change on your Live site.
 
-For example, to override the upstream default value at the site level to PHP 7:
+For example, to override the upstream default value at the site level to PHP 8:
 
-```yaml
-php_version: 7.0
+```yaml:title=pantheon.yml
+php_version: 8.0
 ```
 
 #### Considerations
 
 * [Upgrading PHP Versions](/php-versions) may require you to resolve compatibility issues with your site's codebase.
-* Drupal and PHP 7 require [Drush 7 or greater](/drush-versions/#configure-drush-version).
-* From time to time, we will roll out a new default version of PHP, which will be available to apply as One-click update in the Dashboard. If you are overriding the default, make sure to remove `php_version` from `pantheon.yml` as soon as possible to ensure you don't miss the latest recommended PHP version.
+* From time to time, we will roll out a new default version of PHP, which will be available to apply as a one-click update in the Dashboard. If you are overriding the default, make sure to remove `php_version` from `pantheon.yml` as soon as possible to ensure you don't miss the latest recommended PHP version.
 * You'll always be able to test new default PHP version in Dev and Test before deploying Live.
+
+### Specify a Version of MariaDB
+
+<ReviewDate date="2021-12-22" />
+
+Specify the site's version of MariaDB to keep the software your site uses current and up to date, or set a specific version to avoid incompatibilities:
+
+1. Enable [automated backups](/backups) and [confirm that a backup has been created](/backups#via-the-dashboard) before you configure the database version. Push the changes to a [Multidev](/multidev) and ensure that the site performs as expected.
+
+  Apply this change to an existing environment. If you try to create a new environment with the `database` key specified in `pantheon.yml`, the commit will be rejected with an error.
+
+1. Use the `database` directive in `pantheon.yml` to choose a specific version of MariaDB:
+
+  ```yaml:title=pantheon.yml
+  database:
+    version: 10.4
+  ```
+  
+  This can also be accomplished via [one-click updates in the Site Dashboard](/core-updates#apply-upstream-updates-via-the-site-dashboard).
+
+1. Once the changes are pushed the Workflow can take ten minutes or more to complete. To confirm that the database upgrade completed successfully:
+
+   - Using Terminus (recommended):
+
+     ```shell{promptUser:user}
+     echo "SELECT @@version;" | $(terminus connection:info $SITE.$ENV --fields=mysql_command --format=string)
+     ```
+
+   - From the Site Dashboard, find the **Workflows** <Icon icon="chevron-down" /> dropdown on the Site Dashboard and confirm that the Workflows completed successfully.
+
+Keep in mind that some versions of Drupal and WordPress require a specific minimum or maximum version for compatibility.
+
+This table shows the recommended MariaDB version for each CMS:
+
+| CMS           | Recommended MariaDB Version |
+|---------------|-----------------------------|
+| Drupal < 7.76 | 10.3                        |
+| Drupal ≥ 7.76 | 10.4                        |
+| Drupal < 8.5  | 10.3                        |
+| Drupal ≥ 8.6  | 10.4                        |
+| Drupal ≥ 9.0  | 10.4                        |
+| WordPress     | 10.4                        |
+
+Users of Drupal 6 sites should consider [upgrading to Drupal 7](/drupal-updates#upgrade-from-drupal-6-to-drupal-7) for better support.
+
+#### Considerations - Drupal 9
+
+The default database version for new sites is MariaDB 10.4. In the event your site has any older contrib modules, that are not compatible with MariaDB 10.4, you can set the MariaDB version to `10.3` in your `pantheon.yml` file.
+
+Note that Drupal 9 requires MariaDB 10.3 or later. If you have a Drupal 8 site that you plan to upgrade to Drupal 9, ensure that the database has been upgraded to MariaDB 10.3 or 10.4 in all environments before you begin the Drupal 9 upgrade.
+
+#### Considerations - InnoDB Row Size Too Large
+
+MariaDB 10.4 on Pantheon has `innodb_strict_mode` set to `ON`. This leads to `Row size too large` errors that are not present on earlier versions of MariaDB:
+
+```sql
+returned non-zero exit status 1: ERROR 1118 (42000) at line 1296: Row size too large (> 8126). Changing some columns to TEXT or BLOB may help. In current row format, BLOB prefix of 0 bytes is stored inline.
+```
+
+Before you push the change to `pantheon.yml` to upgrade MariaDB to 10.4, modify your tables to use `row_format=DYNAMIC` to avoid `Row size too large` errors:
+
+<Accordion title="How to update all tables to row_format=DYNAMIC" id="row-size-too-large">
+
+<Partial file="row-size-too-large-alter-table.md" />
+
+</Accordion>
+
+For more information on how to diagnose tables and troubleshoot potential issues, refer to the [official MariaDB documentation](https://mariadb.com/kb/en/troubleshooting-row-size-too-large-errors-with-innodb/).
+
+### Specify a Solr Version
+
+Before you install the Drupal search module, you need to specify the Solr version or set a specific version to avoid incompatibilities. Specify Solr 8 as the search index for Drupal 9 sites:
+
+```yaml:title=pantheon.yml
+search:
+  version: 8
+```
+
+#### Considerations
+
+* The valid values for the versions are `3` and `8`.
+* Currently, Solr 8 is only supported for [Drupal 9](https://pantheon.io/docs/guides/solr-drupal/solr-drupal-9) sites.
 
 ### Drush Version
 
 Add `drush_version` to the top level of the `pantheon.yml` file to configure the Drush version used when making calls remotely on Pantheon:
 
-```yaml
+```yaml:title=pantheon.yml
 drush_version: 8
 ```
 
-For more information and compatibility requirements, see [Managing Drush Versions on Pantheon](/drush-versions/).
+For more information and compatibility requirements, see [Managing Drush Versions on Pantheon](/drush-versions).
 
 ### Filemount Path
 
-Pantheon provides a [cloud-based filesystem](/files) to store user-generated content and other website files. By default, we create a symlink to this filesystem at `sites/default/files` (Drupal) or `wp-content/uploads` (WordPress), but you can change the location with the `filemount` variable.
+Pantheon provides a [cloud-based filesystem](/files) to store user-generated content and other website files. By default, we create a symlink to this filesystem at `sites/default/files` (Drupal), `wp-content/uploads` (WordPress), or `app/uploads` (WordPress using Bedrock), but you can change the location with the `filemount` variable.
 
 <Alert title="Warning" type="danger">
 
@@ -130,7 +219,7 @@ We recommend *only* changing this setting when needed for [Custom Upstream Confi
 
 The only valid filemount path other than the default path for each CMS is `/files` relative to your docroot:
 
-```yaml
+```yaml:title=pantheon.yml
 filemount: /files
 ```
 
@@ -144,7 +233,7 @@ Complete the following before deploying `filemount` (**required**):
 
 ## Quicksilver Platform Integration Hooks
 
-Use the `pantheon.yml` file to define scripts you want executed automatically when a particular workflow is triggered on Pantheon by you or a teammate. For example, you can write a script to post a message to Slack whenever code is pushed to the Site Dashboard.
+Use the `pantheon.yml` file to define scripts you want executed automatically when a particular workflow is triggered on Pantheon by you or a team member. For example, you can write a script to post a message to Slack whenever code is pushed to the Site Dashboard.
 
 For more information, see [Automate your Workflow with Quicksilver Platform Integration Hooks](/quicksilver) and check our growing set of [Platform Integration guides](/guides) demonstrating Quicksilver hooks.
 
@@ -157,6 +246,8 @@ This file should only be edited in the Custom Upstream repository where it is de
 When the same configuration value is defined in both files, the value from `pantheon.yml` will override the value from `pantheon.upstream.yml` at the site-level.
 
 ## Troubleshooting
+
+First, verify the syntax of entries in the file. Refer to the examples above for exact syntax, or try running the contents of your `pantheon.yml` file through a [YAML linter](http://www.yamllint.com/).
 
 ### "Changes to pantheon.yml detected, but there was an error while processing it"
 
@@ -172,7 +263,7 @@ remote: Version '2' is not a valid pantheon.yml version!
 remote: Valid versions are: 1
 ```
 
-While our parser will reject a `pantheon.yml` that is invalid, it won't necessarily give you the exact reason the file is invalid. Please refer to the examples above for exact syntax, or try running the contents of your `pantheon.yml` file through a [YAML linter](http://www.yamllint.com/).
+While our parser will reject a `pantheon.yml` that is invalid, it won't necessarily give you the exact reason the file is invalid. Syntax errors are the most common reason for an invalid `pantheon.yml` file.
 
 ### Deploying Configuration Changes to Multidev
 
@@ -191,7 +282,7 @@ remote:
 
 ### Deploying Hotfixes
 
-Changes made to `pantheon.yml` **are not** detected when deployed as a [hotfix](/hotfixes). As a workaround, make a modification to your `pantheon.yml` file in a development environment (e.g, add a code comment), then deploy up to production using the standard Pantheon workflow.
+Changes made to `pantheon.yml` **are not** detected when deployed as a [hotfix](/hotfixes). As a workaround, make a modification to your `pantheon.yml` file in a development environment (for example add a code comment), then deploy up to production using the standard Pantheon workflow.
 
 ## See Also
 

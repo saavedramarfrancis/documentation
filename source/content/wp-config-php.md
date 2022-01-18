@@ -44,6 +44,8 @@ GITHUB-EMBED https://github.com/pantheon-systems/WordPress/blob/default/wp-confi
 
 In order to get the latest WordPress upstream updates while avoiding merge conflicts, Pantheon includes `wp-config-pantheon.php`.
 
+If you don’t see `wp-config-pantheon.php` in your [WP code directory](/code#wordpress-code-structure), apply the latest upstream updates as shown in [WordPress and Drupal Core Updates](/core-updates).
+
 Do not edit `wp-config-pantheon.php`. It includes database and environment configuration settings that the platform uses and that Pantheon maintains.
 
 ## Environment-specific Configuration
@@ -113,7 +115,7 @@ ini_set( 'error_log', WP_CONTENT_DIR . '/uploads/debug.log' );
 As of WP version 5.1 and newer:
 
 ```php:title=wp-config.php
-define( 'WP_DEBUG_LOG', __DIR__ . '/wp-content/uploads/debug.log'
+define( 'WP_DEBUG_LOG', __DIR__ . '/wp-content/uploads/debug.log' );
 ```
 
 ### Where do I specify database credentials?

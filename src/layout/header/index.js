@@ -134,8 +134,8 @@ const Header = ({ data, page }) => (
                     </Link>
                   </li>
                   <li>
-                    <Link id="getting-started-guide" to="/guides/">
-                      Guides
+                    <Link id="Glossary" to="/glossary">
+                      Glossary
                     </Link>
                   </li>
                   <li>
@@ -190,7 +190,7 @@ export default props => (
   <StaticQuery
     query={graphql`
       query {
-        logo: file(relativePath: { eq: "Pantheon_Color_rev_clear.png" }) {
+        logo: file(relativePath: { eq: "logo-pantheon-logotype.png" }) {
           childImageSharp {
             fluid {
               src

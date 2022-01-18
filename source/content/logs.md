@@ -5,7 +5,8 @@ categories: [platform]
 tags: [logs, newrelic, workflow]
 reviewed: "2020-07-14"
 ---
-Log files track and record your site's activity to help you find, debug, and isolate current or potential problems on your site. Each environment (Multidev, Dev, Test, and Live) has their own respective log files, which can be obtained via SFTP. Application-level logs can be accessed through Drupal directly. In addition to logs, [New Relic Pro](/new-relic) is a great way to help diagnose and fix errors and performance bottlenecks.
+
+Log files track and record your site's activity to help you find, debug, and isolate current or potential problems on your site. Each environment (Multidev, Dev, Test, and Live) has their own respective log files, which can be obtained via SFTP. Application-level logs can be accessed through Drupal directly. In addition to logs, [New Relic&reg; Performance Monitoring](/new-relic) is a great way to help diagnose and fix errors and performance bottlenecks.
 
 The server timezone and all log timestamps are in UTC (Coordinated Universal Time).
 
@@ -52,9 +53,12 @@ In the Connection Information section of the dashboard, we can see a pattern abo
 ### Application Log Files
 
 1. Access the Site Dashboard and desired environment (Multidev, Dev, Test, or Live).
-2. Click **Connection Info** and copy the **SFTP Command Line** command.
-3. Open a terminal window and paste the SFTP connection command.
-4. Run the following SFTP command in terminal:
+
+1. Click **Connection Info** and copy the **SFTP Command Line** command.
+
+1. Open a terminal window and paste the SFTP connection command.
+
+1. Run the following SFTP command in terminal:
 
    ```none
    get -r logs
@@ -62,7 +66,7 @@ In the Connection Information section of the dashboard, we can see a pattern abo
 
 You now have a local copy of the logs directory.
 
-For sites on [Compute Optimized Environments (COE)](/platform-considerations#compute-optimized-environments-coe), the directory structure will resemble:
+The directory structure will resemble:
 
 ```none
 ├── logs
@@ -76,37 +80,27 @@ For sites on [Compute Optimized Environments (COE)](/platform-considerations#com
         └──nginx-error.log
 ```
 
-For sites not on COE, the directory structure will be more like this:
-
-```none
-├── logs
-    └──newrelic.log
-    └──nginx-access.log
-    └──nginx-error.log
-    └──php-error.log
-    └──php-fpm-error.log
-    └──php-slow.log
-```
-
 ### Database Log Files
 
 1. Access the Site Dashboard and desired environment (Multidev, Dev, Test, or Live).
+
 1. Click **Connection Info** and copy the **SFTP Command Line** command.
+
 1. Edit and execute the command by replacing `appserver` with `dbserver`:
 
  From:
 
  ```bash{promptUser: user}
- sftp -o Port=2222 dev.de305d54-75b4-431b-adb2-eb6b9e546014@appserver.dev.de305d54-75b4-431b-adb2-eb6b9e546014.drush.in`
+ sftp -o Port=2222 dev.de305d54-75b4-431b-adb2-eb6b9e546014@appserver.dev.de305d54-75b4-431b-adb2-eb6b9e546014.drush.in
  ```
 
  To:
 
  ```bash{promptUser: user}
- sftp -o Port=2222 dev.de305d54-75b4-431b-adb2-eb6b9e546014@dbserver.dev.de305d54-75b4-431b-adb2-eb6b9e546014.drush.in`
+ sftp -o Port=2222 dev.de305d54-75b4-431b-adb2-eb6b9e546014@dbserver.dev.de305d54-75b4-431b-adb2-eb6b9e546014.drush.in
  ```
 
-4. Run the following SFTP command in terminal:
+1. Run the following SFTP command in terminal:
 
  ```none
  get -r logs
@@ -122,7 +116,7 @@ You now have a local copy of the logs directory, which contains the following:
 
 ## Automate Downloading Logs
 
-You can automate the process of accessing and maintaining these logs with a simple script.
+Automate the process of accessing and maintaining these logs with a script.
 
 ### Create a Script
 
@@ -133,60 +127,31 @@ mkdir $HOME/site-logs
 cd $HOME/site-logs
 ```
 
-Using your favorite text editor, create a file within the `site-logs` directory called `collect-logs.sh` and include the following:
+Choose your preferred method from the following tabs, then click the **Download** button to download the script. Move it to the `site-logs` directory you created, and use your favorite text editor to edit `collect-logs.sh` and replace the `xxxxxxx` with the appropriate site UUID and environment.
+
+The resulting log file might be large.
+
+The script provides several modifiable variables described in its comments:
 
   <TabList>
 
   <Tab title="Rsync version" id="rsync-ver" active={true}>
 
-  ```bash:title=collect-logs.sh
-  #!/bin/bash
-  # Site UUID from Dashboard URL, eg 12345678-1234-1234-abcd-0123456789ab
-  SITE_UUID=xxxxxxxxxxx
-  ENV=live
-  for app_server in `dig +short -4 appserver.$ENV.$SITE_UUID.drush.in`;
-  do
-    rsync -rlvz --size-only --ipv4 --progress -e 'ssh -p 2222' $ENV.$SITE_UUID@$app_server:logs/* app_server_$app_server
-  done
+  <Download file="collect-logs-rsync.sh" />
 
-  # Include MySQL logs
-  for db_server in `dig +short -4 dbserver.$ENV.$SITE_UUID.drush.in`;
-  do
-    rsync -rlvz --size-only --ipv4 --progress -e 'ssh -p 2222' $ENV.$SITE_UUID@$db_server:logs/* db_server_$db_server
-  done
-  ```
+  GITHUB-EMBED https://github.com/pantheon-systems/documentation/blob/main/source/scripts/collect-logs-rsync.sh.txt shell:title=collect-logs-rsync.sh GITHUB-EMBED
 
-  <Alert title="Note" type="info">
-
-  For densely populated directories, using `*` can cause failures. If the script fails, consider removing the wildcard.
-
-  </Alert>
+  [View on GitHub](https://github.com/pantheon-systems/documentation/blob/main/source/scripts/collect-logs-rsync.sh.txt)
 
   </Tab>
 
   <Tab title="SFTP version" id="sftp-ver">
+  
+  <Download file="collect-logs-sftp.sh" />
 
-  ```bash:title=collect-logs.sh
-  #!/bin/bash
-  # Site UUID from Dashboard URL, eg 12345678-1234-1234-abcd-0123456789ab
-  SITE_UUID=xxxxxxxxxxx
-  ENV=live
-  for app_server in `dig +short -4 appserver.$ENV.$SITE_UUID.drush.in`;
-  do
-  mkdir $app_server
-  sftp -o Port=2222 $ENV.$SITE_UUID@$app_server << !
-    cd logs
-    lcd $app_server
-    mget *.log
-  !
-  done
-  ```
+  GITHUB-EMBED https://github.com/pantheon-systems/documentation/blob/main/source/scripts/collect-logs-sftp.sh.txt shell:title=collect-logs-sftp.sh GITHUB-EMBED
 
-  <Alert title="Note" type="info">
-
-  Adjust to `mget *` to include archived log files.
-
-  </Alert>
+  [View on GitHub](https://github.com/pantheon-systems/documentation/blob/main/source/scripts/collect-logs-sftp.sh.txt)
 
   </Tab>
 
@@ -210,7 +175,7 @@ See [Parsing nginx Access Logs with GoAccess](/nginx-access-log) for details.
 
 ### What is the first line in nginx-access.log?
 
-The first entry reflects an internal IP address of Pantheon's routing layer. The last entry provides a list of IPs used to serve the request, starting with the client IP and ending with internal IPs from the routing layer. For environments with HTTPS enabled, the loadbalancer IP address will be listed second, after the client IP.
+The first entry reflects an internal IP address of Pantheon's routing layer. The last entry provides a list of IPs used to serve the request, starting with the client IP and ending with internal IPs from the routing layer. For environments with HTTPS enabled, the load balancer IP address will be listed second, after the client IP.
 
 The client IP for the following example is `122.248.101.126`:
 
@@ -220,11 +185,11 @@ The client IP for the following example is `122.248.101.126`:
 
 ### Can I log to the system logger and access syslog?
 
-No, syslog is not available. Technically, you can log Drupal events using the syslog module, but you won't be able to read or access them.  You can use the [error_log](https://secure.php.net/manual/en/function.error-log.php) function to log to the php-error.log, which is accessible in the logs directory.
+No, syslog is not available. Technically, you can log Drupal events using the syslog module, but you won't be able to read or access them. You can use the [error_log](https://secure.php.net/manual/en/function.error-log.php) function to log to the php-error.log, which is accessible in the logs directory.
 
 ### Can I access Apache Solr logs?
 
-No, access to Apache Solr logs is not available. For more information on debugging Solr, see [Apache Solr on Pantheon](/solr).
+No, access to Apache Solr logs is not available. For more information on debugging Solr, refer to the documentation on [Pantheon Search](/solr).
 
 ### Can I download Varnish logs?
 
@@ -254,13 +219,13 @@ By default, Drupal logs events using the Database Logging module (dblog). PHP fa
 - Using [Terminus](/terminus):
 
  ```bash{promptUser: user}
- terminus drush <site>.<env> -- watchdog-show
+ terminus drush <site>.<env> -- watchdog-show
  ```
 
 - Terminus can invoke Drush commands to "watch" events in real-time; `--tail` can be used to continuously show new watchdog messages until  interrupted (Control+C).
 
  ```bash{promptUser: user}
- terminus drush <site>.<env> -- watchdog-show --tail
+ terminus drush <site>.<env> -- watchdog-show --tail
  ```
 
 ### My Drupal database logs are huge. Should I disable dblog?
@@ -285,15 +250,15 @@ You can also create the `logwatcher.sh` script below, which uses [Terminus](/ter
 
   ```bash:title=logwatcher.sh
   #!/bin/bash
-  TERMINUS_HIDE_UPDATE_MESSAGE=1
+  export TERMINUS_HIDE_UPDATE_MESSAGE=1
 
-  LOGPATH=~/projects/mysite/logs
+  LOGPATH=~/projects/mysite/logs/
   LOGFILE=php-error.log
   SITE=sitename
   ENV=environment
 
   touch $LOGPATH/$LOGFILE
-  terminus rsync $SITE.$ENV:logs/$LOGFILE $LOGPATH
+  terminus rsync $SITE.$ENV:logs/php/$LOGFILE $LOGPATH
 
   tail $LOGPATH/$LOGFILE
   ```
@@ -319,8 +284,9 @@ You can also create the `logwatcher.sh` script below, which uses [Terminus](/ter
    Stop the process with **CTRL-C**.
 
 ## See Also
+
 - [MySQL Slow Log](/mysql-slow-log)
 - [PHP Slow Log](/php-slow-log)
 - [PHP Errors and Exceptions](/php-errors)
 - [Bots and Indexing](/bots-and-indexing)
-- [New Relic](/new-relic)
+- [New Relic&reg; Performance Monitoring](/new-relic)
